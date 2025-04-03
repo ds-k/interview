@@ -1,37 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 개발자 인터뷰 질문 모음
 
-## Getting Started
+개발자 면접 준비를 위한 다양한 질문과 답변을 제공하는 웹 애플리케이션입니다. CS, Frontend, Mobile 분야의 질문들을 찾아보고 학습할 수 있습니다.
 
-First, run the development server:
+## 주요 기능
+
+- **다양한 카테고리**: CS 기초, Frontend(JavaScript, TypeScript, React), Mobile(Flutter) 등 다양한 분야의 질문
+- **질문 목록 모드**: 모든 질문과 답변을 한눈에 확인
+- **퀴즈 모드**: 질문을 하나씩 넘기며 자가 테스트 가능
+- **반응형 디자인**: 모바일, 태블릿, 데스크톱 등 다양한 기기에서 사용 가능
+
+## 개발 스택
+
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+- **배포**: Vercel
+
+## 로컬 개발 환경 설정
 
 ```bash
+# 저장소 클론
+git clone https://github.com/ds-k/interview.git
+cd interview
+
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+개발 서버가 실행되면 [http://localhost:3000](http://localhost:3000)에서 사이트를 확인할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 기여하기
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+이 프로젝트에 기여하고 싶으시다면:
 
-## Learn More
+1. 이 저장소를 포크하세요
+2. 새 브랜치를 만드세요 (`git checkout -b feature/your-feature`)
+3. 변경사항을 커밋하세요 (`git commit -am 'Add some feature'`)
+4. 브랜치에 푸시하세요 (`git push origin feature/your-feature`)
+5. Pull Request를 제출하세요
 
-To learn more about Next.js, take a look at the following resources:
+## 라이선스
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# interview
+MIT License
