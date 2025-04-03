@@ -167,6 +167,17 @@ const jsQuestions: QnA[] = [
     answer:
       "브라우저 렌더링 최적화 방법으로는 1) DOM 조작 최소화 및 일괄 처리, 2) 레이아웃 스레싱(thrashing) 방지를 위해 offsetHeight 등의 속성 읽기와 쓰기 분리, 3) requestAnimationFrame을 사용한 애니메이션 구현, 4) 복잡한 계산을 Web Worker로 이동, 5) 이미지 최적화 및 지연 로딩, 6) CSS 애니메이션 사용(transform, opacity), 7) 가상 DOM 활용, 8) 불필요한 리렌더링 방지, 9) 코드 스플리팅과 지연 로딩(lazy loading) 등이 있습니다.",
   },
+  {
+    question: "불변성(Immutability)이 중요한 이유와 구현 방법을 설명해주세요.",
+    answer:
+      "불변성은 데이터의 상태를 변경하지 않고 새로운 상태를 만드는 것을 의미합니다. 이는 예측 가능한 상태 관리, 버그 감소, 프로그램의 안정성 향상에 도움이 됩니다. Object.freeze(), spread 연산자, Object.assign(), Immer 라이브러리 등을 통해 구현할 수 있습니다. React에서는 불변성을 지켜야 상태 변화를 감지하고 리렌더링을 트리거할 수 있습니다.",
+  },
+  {
+    question:
+      "메모리 누수(Memory Leak)의 일반적인 원인과 해결 방법을 설명해주세요.",
+    answer:
+      "메모리 누수는 더 이상 필요하지 않은 메모리가 해제되지 않는 현상입니다. 주요 원인으로는 불필요한 전역 변수, 제거되지 않은 이벤트 리스너, 해제되지 않은 타이머, 순환 참조 등이 있습니다. 해결 방법으로는 이벤트 리스너 제거(removeEventListener), clearTimeout/clearInterval 사용, WeakMap/WeakSet 활용, 적절한 스코프 관리 등이 있습니다. Chrome DevTools의 Memory 탭을 통해 메모리 누수를 분석할 수 있습니다.",
+  },
 ];
 
 export default jsQuestions;
