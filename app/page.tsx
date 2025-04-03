@@ -1,102 +1,227 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import Tabs from "./components/Tabs";
+import SubTabs from "./components/SubTabs";
+import QuestionCard from "./components/QuestionCard";
+import { QnA, SubCategory, MainDataType } from "./types";
+
+// CS 질문 가져오기
+import csQuestions from "./data/cs/csQuestions";
+// Frontend 질문 가져오기
+import jsQuestions from "./data/frontend/jsQuestion";
+import tsQuestions from "./data/frontend/tsQuestions";
+import reactQuestions from "./data/frontend/reactQuestions";
+// Mobile 질문 가져오기
+import flutterQuestions from "./data/mobile/flutterQuestions";
+
+// 실제 데이터 구성
+const REAL_DATA: MainDataType = {
+  CS: csQuestions,
+  Frontend: {
+    JavaScript: jsQuestions,
+    TypeScript: tsQuestions,
+    React: reactQuestions,
+  },
+  Mobile: {
+    Flutter: flutterQuestions,
+  },
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const mainTabs = Object.keys(REAL_DATA);
+  const [activeMainTab, setActiveMainTab] = useState(mainTabs[0]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // 하위 탭 관련 상태
+  const [subTabs, setSubTabs] = useState<string[]>([]);
+  const [activeSubTab, setActiveSubTab] = useState<string>("");
+
+  // 퀴즈 모드 관련 상태
+  const [viewMode, setViewMode] = useState<"list" | "quiz">("list");
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [randomizedQuestions, setRandomizedQuestions] = useState<QnA[]>([]);
+
+  // 메인 탭이 변경될 때 하위 탭 설정
+  useEffect(() => {
+    if (activeMainTab === "CS") {
+      setSubTabs([]);
+      setActiveSubTab("");
+    } else {
+      try {
+        const category = REAL_DATA[activeMainTab as keyof MainDataType];
+        if (category && typeof category === "object") {
+          const newSubTabs = Object.keys(category as SubCategory);
+          setSubTabs(newSubTabs);
+          if (newSubTabs.length > 0) {
+            setActiveSubTab(newSubTabs[0]);
+          } else {
+            setActiveSubTab("");
+          }
+        } else {
+          setSubTabs([]);
+          setActiveSubTab("");
+        }
+      } catch (error) {
+        console.error("서브탭 설정 중 오류:", error);
+        setSubTabs([]);
+        setActiveSubTab("");
+      }
+    }
+  }, [activeMainTab]);
+
+  // 현재 활성화된 탭/서브탭에 맞는 질문 데이터 가져오기
+  const getCurrentQuestions = (): QnA[] => {
+    if (activeMainTab === "CS") {
+      return REAL_DATA.CS;
+    } else {
+      const subCategory = REAL_DATA[
+        activeMainTab as keyof MainDataType
+      ] as SubCategory;
+
+      // 서브탭이 있고, 해당 서브탭의 질문 배열이 존재하는지 확인
+      if (activeSubTab && subCategory && subCategory[activeSubTab]) {
+        return subCategory[activeSubTab];
+      }
+
+      // 서브탭이 없거나 질문 배열이 없으면 빈 배열 반환
+      return [];
+    }
+  };
+
+  // 탭이나 서브탭이 변경될 때 퀴즈 모드 질문 리셋
+  useEffect(() => {
+    const questions = getCurrentQuestions();
+    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+    setRandomizedQuestions(shuffled);
+    setCurrentQuestionIndex(0);
+  }, [activeMainTab, activeSubTab]);
+
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < randomizedQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // 마지막 문제면 처음으로 돌아감
+      setCurrentQuestionIndex(0);
+    }
+  };
+
+  const goToPrevQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else {
+      // 첫 문제면 마지막으로 이동
+      setCurrentQuestionIndex(randomizedQuestions.length - 1);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <header className="max-w-4xl mx-auto mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
+          개발자 인터뷰 질문
+        </h1>
+        <p className="text-sm md:text-base text-gray-600 text-center">
+          CS, Frontend, Mobile 관련 질문과 답변 모음
+        </p>
+      </header>
+
+      <main className="max-w-4xl mx-auto">
+        {/* 메인 탭 */}
+        <Tabs
+          tabs={mainTabs}
+          activeTab={activeMainTab}
+          onTabChange={setActiveMainTab}
+        />
+
+        {/* 서브 탭 (필요한 경우에만 표시) */}
+        {subTabs.length > 0 && (
+          <SubTabs
+            tabs={subTabs}
+            activeTab={activeSubTab}
+            onTabChange={setActiveSubTab}
+          />
+        )}
+
+        {/* 모드 전환 버튼 */}
+        <div className="flex justify-center mt-4 mb-6">
+          <button
+            className={`px-4 py-2 mx-1 rounded-md ${
+              viewMode === "list"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setViewMode("list")}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            목록 모드
+          </button>
+          <button
+            className={`px-4 py-2 mx-1 rounded-md ${
+              viewMode === "quiz"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setViewMode("quiz")}
           >
-            Read our docs
-          </a>
+            퀴즈 모드
+          </button>
         </div>
+
+        {/* 질문 목록 또는 퀴즈 표시 */}
+        {viewMode === "list" ? (
+          <div className="space-y-4">
+            {Array.isArray(getCurrentQuestions()) ? (
+              getCurrentQuestions().map((qna, idx) => (
+                <QuestionCard
+                  key={idx}
+                  question={qna.question}
+                  answer={qna.answer}
+                />
+              ))
+            ) : (
+              <div className="p-4 bg-yellow-100 text-yellow-800 rounded-md">
+                질문을 불러오는 중 문제가 발생했습니다. 다른 탭을 선택해보세요.
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            {randomizedQuestions.length > 0 ? (
+              <>
+                <div className="w-full max-w-2xl">
+                  <QuestionCard
+                    question={
+                      randomizedQuestions[currentQuestionIndex].question
+                    }
+                    answer={randomizedQuestions[currentQuestionIndex].answer}
+                  />
+                </div>
+                <div className="flex mt-4">
+                  <button
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md mx-1"
+                    onClick={goToPrevQuestion}
+                  >
+                    이전 문제
+                  </button>
+                  <div className="px-4 py-2 bg-gray-100 rounded-md mx-1">
+                    {currentQuestionIndex + 1} / {randomizedQuestions.length}
+                  </div>
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md mx-1"
+                    onClick={goToNextQuestion}
+                  >
+                    다음 문제
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p>질문이 없습니다.</p>
+            )}
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="max-w-4xl mx-auto mt-12 text-center text-gray-500 text-sm">
+        © 2024 개발자 인터뷰 질문 모음. 모든 권리 보유.
       </footer>
     </div>
   );
