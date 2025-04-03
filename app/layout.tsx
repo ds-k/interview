@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,15 +12,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "개발자 인터뷰 질문 모음",
   description: "CS, Frontend, Mobile 개발자 면접을 위한 질문과 답변 모음",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
   },
   authors: [{ name: "ds-k", url: "https://github.com/ds-k" }],
   keywords: [
